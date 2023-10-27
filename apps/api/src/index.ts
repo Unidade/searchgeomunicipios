@@ -1,9 +1,26 @@
-import { createServer } from "./server";
-import { log } from "logger";
+import "dotenv/config"
 
-const port = process.env.PORT || 3001;
-const server = createServer();
+import { redisClient, setupRedis } from "./infrastructure/redis.js"
+import { createServer } from "./app.js"
+import { log } from "logger"
 
-server.listen(port, () => {
-  log(`api running on ${port}`);
-});
+await setupRedis()
+
+const app = createServer()
+const port = process.env.PORT || 8080
+const server = app.listen(port, () => {
+  log(`Server is running on port ${port}`)
+})
+
+process.on("SIGTERM", () => {
+  log("SIGTERM signal received.")
+  log("Closing http server.")
+  server.close(() => {
+    log("Http server closed.")
+
+    redisClient.quit().then(() => {
+      log("Redis client closed")
+      process.exit(0)
+    })
+  })
+})

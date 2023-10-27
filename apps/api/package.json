@@ -18,7 +18,13 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "logger": "*",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "ndjson": "^2.0.0",
+    "redis": "^4.6.10",
+    "swagger-ui-express": "^5.0.0",
+    "wellknown": "^0.5.0",
+    "yamljs": "^0.3.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
@@ -26,8 +32,12 @@
     "@types/express": "^4.17.12",
     "@types/jest": "^26.0.22",
     "@types/morgan": "^1.9.2",
+    "@types/ndjson": "^2.0.3",
     "@types/node": "^15.12.2",
     "@types/supertest": "^2.0.11",
+    "@types/swagger-ui-express": "^4.1.5",
+    "@types/wellknown": "^0.5.7",
+    "@types/yamljs": "^0.2.33",
     "esbuild": "^0.14.38",
     "esbuild-register": "^3.3.2",
     "eslint": "^7.32.0",

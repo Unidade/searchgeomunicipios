@@ -1,0 +1,107 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+info:
+  title: Brazilian Municipality Search
+  description: >
+    Search for brazilian municipalities within a given polygon. Utilizes the Redis Search 7.2 GEOSHAPE API to search for polygons within a given area.
+  version: 1.0.0
+
+paths:
+  /search:
+    post:
+      tags:
+        - Municipio
+      description: Search for Brazilian Municipality in a given polygon
+      summary: Search for polygons
+      operationId: searchPolygons
+      requestBody:
+        description: polygon
+        required: true
+        content:
+          application/json:
+            schema:
+              title: polygon
+              allOf:
+                - $ref: "#/components/schemas/polygon"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/municipio"
+
+  /municipio:
+    post:
+      tags:
+        - Municipio
+      description: Add a new municipio to the database
+      summary: Add a new municipio
+      operationId: addMunicipio
+      requestBody:
+        description: municipio
+        required: true
+        content:
+          application/json:
+            schema:
+              title: municipio
+              allOf:
+                - $ref: "#/components/schemas/municipio"
+      responses:
+        "204":
+          description: "Successfully added municipiality"
+components:
+  schemas:
+    polygon:
+      type: object
+      properties:
+        polygon:
+          $ref: "#/components/schemas/geojson"
+
+    geojson:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Polygon
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+                format: double
+
+    municipio:
+      type: object
+      properties:
+        geometry:
+          type: object
+          $ref: "#/components/schemas/geojson"
+        properties:
+          type: object
+          $ref: "#/components/schemas/properties_municipio"
+
+    properties_municipio:
+      type: object
+      properties:
+        CD_MUN:
+          type: string
+        NM_MUN:
+          type: string
+        SIGLA_UF:
+          type: string
+        AREA_KM2:
+          type: number
+          format: double
+        POPULATION:
+          type: number
+          format: uint32
