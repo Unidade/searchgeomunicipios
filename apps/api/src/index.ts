@@ -1,4 +1,4 @@
-import "dotenv/config"
+import "./utils/loadenv.js"
 
 import { redisClient, setupRedis } from "./infrastructure/redis.js"
 import { createServer } from "./app.js"

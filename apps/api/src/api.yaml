@@ -5,8 +5,7 @@ servers:
 
 info:
   title: Brazilian Municipality Search
-  description: >
-    Search for brazilian municipalities within a given polygon. Utilizes the Redis Search 7.2 GEOSHAPE API to search for polygons within a given area.
+  description: Search for brazilian municipalities within a given polygon. Utilizes the Redis Search 7.2 GEOSHAPE API to search for polygons within a given area.
   version: 1.0.0
 
 paths:
@@ -15,7 +14,7 @@ paths:
       tags:
         - Municipio
       description: Search for Brazilian Municipality in a given polygon
-      summary: Search for polygons
+      summary: Search for Brazilian Municipality
       operationId: searchPolygons
       requestBody:
         description: polygon
@@ -55,10 +54,14 @@ paths:
       responses:
         "204":
           description: "Successfully added municipiality"
+
 components:
   schemas:
     polygon:
       type: object
+      required:
+        - polygon
+      description: GeoJSON Polygon
       properties:
         polygon:
           $ref: "#/components/schemas/geojson"
@@ -69,23 +72,30 @@ components:
         type:
           type: string
           enum:
-            - Polygon
-        coordinates:
-          type: array
-          items:
-            type: array
-            items:
+            - Feature
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - Polygon
+                - MultiPolygon
+            coordinates:
               type: array
               items:
-                type: number
-                format: double
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: number
+                    format: double
+                  minItems: 2
+                  maxItems: 2
 
     municipio:
       type: object
       properties:
-        geometry:
-          type: object
-          $ref: "#/components/schemas/geojson"
         properties:
           type: object
           $ref: "#/components/schemas/properties_municipio"
@@ -93,15 +103,18 @@ components:
     properties_municipio:
       type: object
       properties:
-        CD_MUN:
+        code:
           type: string
-        NM_MUN:
+        name:
           type: string
-        SIGLA_UF:
+        state:
           type: string
-        AREA_KM2:
+        area_km2:
           type: number
           format: double
-        POPULATION:
+        population:
           type: number
           format: uint32
+        boundaries:
+          type: string
+          description: Well known text (WKT) representation of the polygon

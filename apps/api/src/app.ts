@@ -7,8 +7,12 @@ import { notFound } from "./middleware/404.js"
 import { handleError } from "./middleware/handle-error.js"
 import cors from "cors"
 import morgan from "morgan"
+import * as url from "url"
+import path from "path"
 
-const swaggerDocument = YAML.load("api.yaml")
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url))
+
+const swaggerDocument = YAML.load(path.join(__dirname, "api.yaml"))
 
 export const createServer = () => {
   const app = express()

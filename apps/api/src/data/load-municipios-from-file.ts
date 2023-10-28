@@ -4,8 +4,9 @@ import ndjson from "ndjson"
 
 import { hashFile } from "../utils/hashFile.js"
 import { Municipio, newMunicipio } from "../model/municipio.js"
-import { redisClient } from "../infrastructure/redis.js"
+import { redisClient, setupRedis } from "../infrastructure/redis.js"
 import { getMunicipioUseCase } from "../app/usecase.js"
+import { log } from "logger"
 
 export async function loadMunicipiosDataFromFile(path: string) {
   if (typeof path !== "string" || path.trim() === "") {
@@ -20,10 +21,11 @@ export async function loadMunicipiosDataFromFile(path: string) {
     path = nodePath.join(process.cwd(), path)
   }
 
+  await setupRedis()
   try {
     await _loadMunicipiosDataFromFile(path)
   } catch (error) {
-    console.error(`Error loading data from file ${path}:`, error)
+    log(`Error loading data from file ${path}:`, "error")
   } finally {
     await redisClient.quit()
   }
@@ -34,12 +36,12 @@ async function _loadMunicipiosDataFromFile(path: string) {
 
   const isLoaded = await redisClient.get(`data:${hash}`)
   if (isLoaded) {
-    console.log(`Data content from file ${path} already loaded`)
+    log(`Data content from file ${path} already loaded`, "warn")
     return
   }
 
   const extName = nodePath.extname(path)
-  console.log("path:", path)
+  log(`path: ${path}`)
 
   let data: Municipio[] = []
 
@@ -54,11 +56,11 @@ async function _loadMunicipiosDataFromFile(path: string) {
 
   const useCase = await getMunicipioUseCase()
 
-  console.log("Starting to load data")
+  log("Starting to load data")
   const result = await useCase.loadMunicipios(data)
-  console.log(`Loaded ${result.totalOfSuccessSaves} municipios`)
+  log(`Loaded ${result.totalOfSuccessSaves} municipios`)
   if (result.errors && result.errors.length > 0) {
-    console.log(`Failed to load ${result.errors.length}:`)
+    log(`Failed to load ${result.errors.length}:`)
     /**
      * @todo
      * Add a retry mechanism
@@ -79,7 +81,7 @@ async function _loadMunicipiosDataFromFile(path: string) {
  * @returns
  */
 export async function getJsonNLMunicipiosData(
-  path: string,
+  path: string
 ): Promise<Municipio[]> {
   const fetchedData: Municipio[] = []
 

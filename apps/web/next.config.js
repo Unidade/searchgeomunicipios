@@ -1,10 +1,13 @@
 const path = require("path");
-
+/** @type {import('next').NextConfig} */
 module.exports = {
-  reactStrictMode: true,
   transpilePackages: ["ui"],
   output: "standalone",
   experimental: {
     outputFileTracingRoot: path.join(__dirname, "../../"),
+    turbotrace: {
+      logDetail: true
+    },
+    typedRoutes: true,
   },
 };
