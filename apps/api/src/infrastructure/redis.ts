@@ -15,5 +15,5 @@ export type RedisClientType = typeof redisClient
 export async function setupRedis() {
   log(`Connecting to redis url: ${redisClient.options?.url}`)
   await redisClient.connect()
-  log("Successfully connect to redis")
+  log("Successfully connected to redis")
 }

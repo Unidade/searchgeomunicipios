@@ -8,7 +8,7 @@ import {
 import wellknown, { GeoJSONFeature } from "wellknown"
 import { RedisClientType, redisClient } from "../../infrastructure/redis.js"
 import { searchReplyToJson } from "../../utils/searchReply.js"
-import { convertGeoJsonToPolygon } from "../../utils/format.js"
+import { convertGeoJsonToPolygon } from "../../utils/convertGeoJsonToPolygon.js"
 
 type RedisMuncipio = {
   code: Municipio["properties"]["CD_MUN"]
@@ -77,7 +77,7 @@ class RedisMunicipioRepository_ implements MunicipioRepository {
     return this.#redisClient.json.set(
       `region:${redisMunicipioModel.code}`,
       "$",
-      redisMunicipioModel,
+      redisMunicipioModel
     )
   }
 
@@ -99,7 +99,7 @@ class RedisMunicipioRepository_ implements MunicipioRepository {
 
   async search(polygon: string): Promise<Municipio[]> {
     const polygonWKnown = wellknown.stringify(
-      polygon as unknown as GeoJSONFeature,
+      polygon as unknown as GeoJSONFeature
     )
 
     const response = await this.#redisClient.ft.search(
@@ -114,7 +114,7 @@ class RedisMunicipioRepository_ implements MunicipioRepository {
           from: 0,
           size: 5572,
         },
-      },
+      }
     )
 
     const results = searchReplyToJson<Municipio>(response)
@@ -162,7 +162,7 @@ class RedisMunicipioRepository_ implements MunicipioRepository {
     } = municipio.properties
 
     const boundaries = convertGeoJsonToPolygon(
-      municipio.geometry as unknown as GeoJSONFeature,
+      municipio.geometry as unknown as GeoJSONFeature
     )
     if (!boundaries) {
       throw new Error("Could not convert geometry to well known string")
@@ -183,7 +183,7 @@ let RedisMunicipioRepository: RedisMunicipioRepository_ | undefined
 export const getRedisMunicipioRepository = async () => {
   if (!RedisMunicipioRepository) {
     RedisMunicipioRepository = await new RedisMunicipioRepository_(
-      redisClient,
+      redisClient
     ).setup()
   }
   return RedisMunicipioRepository

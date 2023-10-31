@@ -34,7 +34,7 @@ COPY turbo.json turbo.json
 
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
-s
+
 RUN npx turbo run build --filter=api...
 
 FROM base AS runner

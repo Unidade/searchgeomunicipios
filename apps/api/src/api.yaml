@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 servers:
   - url: http://localhost:8080
     description: Local server
@@ -24,7 +24,7 @@ paths:
             schema:
               title: polygon
               allOf:
-                - $ref: "#/components/schemas/polygon"
+                - $ref: "#/components/schemas/Feature"
       responses:
         "200":
           description: OK
@@ -33,7 +33,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/municipio"
+                  $ref: "#/components/schemas/MunicipioFeature"
 
   /municipio:
     post:
@@ -48,73 +48,136 @@ paths:
         content:
           application/json:
             schema:
-              title: municipio
+              title: Municipio Data
               allOf:
-                - $ref: "#/components/schemas/municipio"
+                - $ref: "#/components/schemas/MunicipioFeature"
+             
       responses:
         "204":
-          description: "Successfully added municipiality"
+          description: "Successfully added municipality"
 
 components:
   schemas:
-    polygon:
+    "GeoJsonObject":
+      description: >
+        GeoJSon object
+        The coordinate reference system for all GeoJSON coordinates is a
+        geographic coordinate reference system, using the World Geodetic System
+        1984 (WGS 84) datum, with longitude and latitude units of decimal
+        degrees.
+        This is equivalent to the coordinate reference system identified by the
+        Open Geospatial Consortium (OGC) URN
+        An OPTIONAL third-position element SHALL be the height in meters above
+        or below the WGS 84 reference ellipsoid.
+        In the absence of elevation values, applications sensitive to height or
+        depth SHOULD interpret positions as being at local ground or sea level.
+      externalDocs:
+        url: "https://tools.ietf.org/html/rfc7946#section-3"
       type: object
-      required:
-        - polygon
-      description: GeoJSON Polygon
       properties:
-        polygon:
-          $ref: "#/components/schemas/geojson"
-
-    geojson:
-      type: object
-      properties:
-        type:
+        "type":
           type: string
           enum:
             - Feature
-        geometry:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - Polygon
-                - MultiPolygon
-            coordinates:
-              type: array
-              items:
-                type: array
-                items:
-                  type: array
-                  items:
-                    type: number
-                    format: double
-                  minItems: 2
-                  maxItems: 2
+            - FeatureCollection
+            - Point
+            - MultiPoint
+            - LineString
+            - MultiLineString
+            - Polygon
+            - MultiPolygon
+            - GeometryCollection
+        "bbox":
+          description: >
+            A GeoJSON object MAY have a member named "bbox" to include
+            information on the coordinate range for its Geometries, Features, or
+            FeatureCollections. The value of the bbox member MUST be an array of
+            length 2*n where n is the number of dimensions represented in the
+            contained geometries, with all axes of the most southwesterly point
+            followed by all axes of the more northeasterly point. The axes order
+            of a bbox follows the axes order of geometries.
+          type: array
+          items:
+            type: number
+      required:
+        - type
+      discriminator:
+        propertyName: type
 
-    municipio:
-      type: object
-      properties:
+     'Geometry':
+      description: >
+        Abstract type for all GeoJSon object except Feature and
+        FeatureCollection
+      externalDocs:
+        url: 'https://tools.ietf.org/html/rfc7946#section-3'
+      allOf:
+      - $ref: '#/components/schemas/GeoJsonObject'
+      - type: object
         properties:
-          type: object
-          $ref: "#/components/schemas/properties_municipio"
+          'type':
+            type: string
+            enum:
+            - Polygon
+            - MultiPolygon
 
-    properties_municipio:
+        required:
+        - type
+        discriminator:
+          propertyName: type
+
+    "Feature":
+      description: GeoJSon 'Feature' object
+      externalDocs:
+        url: "https://tools.ietf.org/html/rfc7946#section-3.2"
+      allOf:
+        - $ref: "#/components/schemas/GeoJsonObject"
+        - type: object
+          required:
+            - geometry
+            - properties
+          properties:
+            "geometry":
+              allOf:
+                - $ref: "#/components/schemas/Geometry"
+            "properties":
+              type: object
+              nullable: true
+            "id":
+              oneOf:
+                - type: number
+                - type: string
+
+    "MunicipioFeature": 
+      description: GeoJson Municipio Feature
+      allOf:
+        - $ref: "#/components/schemas/Feature"
+        - type: object
+          properties:
+            "properties":
+              allOf:
+                - $ref: "#/components/schemas/MunicipioPropeties"
+            "geometry":
+              allOf:
+                - $ref: "#/components/schemas/Geometry"
+
+    "MunicipioPropeties": 
+      description: Municipio Geojson Properties
       type: object
       properties:
-        code:
+        CD_MUN:
           type: string
-        name:
+          description: IBGE code
+        NM_MUN:
           type: string
-        state:
+          description: Municipality name
+        SIGLA_UF:
           type: string
-        area_km2:
+          description: State name
+        AREA_KM2:
           type: number
           format: double
-        population:
+          description: Area in square kilometers
+        POPULATION:
           type: number
           format: uint32
-        boundaries:
-          type: string
-          description: Well known text (WKT) representation of the polygon
+          description: Population

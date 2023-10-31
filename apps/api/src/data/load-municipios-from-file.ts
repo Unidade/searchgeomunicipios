@@ -25,7 +25,10 @@ export async function loadMunicipiosDataFromFile(path: string) {
   try {
     await _loadMunicipiosDataFromFile(path)
   } catch (error) {
-    log(`Error loading data from file ${path}:`, "error")
+    if (error instanceof Error) {
+      log(error.message, "error")
+    }
+    log(`Error loading data from file ${path}`, "error")
   } finally {
     await redisClient.quit()
   }
@@ -47,7 +50,7 @@ async function _loadMunicipiosDataFromFile(path: string) {
 
   switch (extName) {
     case ".geojsonl" || ".jsonl":
-      data = await getJsonNLMunicipiosData(path)
+      data = await getJsonNLMunicipiosDataFromFile(path)
       break
 
     default:
@@ -80,7 +83,7 @@ async function _loadMunicipiosDataFromFile(path: string) {
  * @param path path to a NL geojson file
  * @returns
  */
-export async function getJsonNLMunicipiosData(
+export async function getJsonNLMunicipiosDataFromFile(
   path: string
 ): Promise<Municipio[]> {
   const fetchedData: Municipio[] = []

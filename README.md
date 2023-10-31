@@ -35,5 +35,5 @@ Foi necessário realizar o mapeamento entre as informações fornecidas pela fon
     NM_MUN: name,
     SIGLA_UF: state,
     AREA_KM2: area_km2,
-    boundaries: <wellknown polygon string>
+    geometry: <wellknown polygon string>
 ```

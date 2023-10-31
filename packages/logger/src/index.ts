@@ -1,7 +1,7 @@
-import { pino } from "pino"
+import { Level, pino } from "pino"
 
-export const log = (str: any) => {
-  logger.info(str)
+export const log = (str: any, level: Level = "info") => {
+  return logger[level](str)
 }
 
 const logger = pino({

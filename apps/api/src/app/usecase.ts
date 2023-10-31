@@ -5,7 +5,7 @@ import {
 } from "../model/municipio.js"
 import { getRedisMunicipioRepository } from "../model/repository/municipio.js"
 import { GeoJSONFeature } from "wellknown"
-import { convertGeoJsonToPolygon } from "../utils/format.js"
+import { convertGeoJsonToPolygon } from "../utils/convertGeoJsonToPolygon.js"
 
 interface _MunicipioUseCase {
   loadMunicipios(data: Municipio[]): Promise<SaveAllResponse>
@@ -19,7 +19,7 @@ class MunicipioUseCase implements _MunicipioUseCase {
   }
 
   async searchMunicipiosWithinPolygon(
-    polygon: GeoJSONFeature,
+    polygon: GeoJSONFeature
   ): Promise<Municipio[]> {
     const wellKnowString = convertGeoJsonToPolygon(polygon)
     const municipios = await this.#repository.search(wellKnowString)

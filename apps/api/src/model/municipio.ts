@@ -10,13 +10,17 @@ const properties_schema = zod.object({
 
 const geometry_schema = zod.object({
   type: zod.string(),
-  coordinates: zod.array(zod.array(zod.array(zod.number()))),
+  coordinates: zod.array(zod.array(zod.number().array().length(2))),
 })
 
-export const municipio_schema = zod.object({
+export const geoJson_schema = zod.object({
   type: zod.string(),
-  properties: properties_schema,
   geometry: geometry_schema,
+  properties: zod.optional(zod.record(zod.string(), zod.any())),
+})
+
+export const municipio_schema = geoJson_schema.extend({
+  properties: properties_schema,
 })
 
 export type Municipio = zod.infer<typeof municipio_schema>
@@ -33,7 +37,7 @@ export interface MunicipioRepository {
 
 export function newMunicipio(
   data: unknown,
-  safeparse: boolean,
+  safeparse: boolean
 ): Municipio | undefined
 export function newMunicipio(data: unknown): Municipio
 

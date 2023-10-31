@@ -4,7 +4,10 @@ import YAML from "yamljs"
 import { router as searchRouter } from "./routers/search.js"
 import { router as municipioRouter } from "./routers/municipio.js"
 import { notFound } from "./middleware/404.js"
-import { handleError } from "./middleware/handle-error.js"
+import {
+  handleClientError,
+  handleServerError,
+} from "./middleware/errors/index.js"
 import cors from "cors"
 import morgan from "morgan"
 import * as url from "url"
@@ -27,7 +30,8 @@ export const createServer = () => {
     .use("/search", searchRouter)
     .use("/municipio", municipioRouter)
     .use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-    .use(handleError)
+    .use(handleClientError)
+    .use(handleServerError)
     .use(notFound)
 
   return app
